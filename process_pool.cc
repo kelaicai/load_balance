@@ -153,7 +153,6 @@ int run_child(int index)
                 ret=recv(fd,(char*)&client,sizeof(client),0);
                 if(ret<0)
                 {
-                    printf("sub_process timeout\n");
                     if(errno!=EAGAIN)
                     {
                         stop_child=true;
@@ -190,7 +189,8 @@ int run_child(int index)
                         ret=recv(fd,users[fd].buf,BUFFER_SIZE,0);
                         if(ret<0)
                         {
-                            if(errno!=EAGAIN)  //conneciotn is invalid and similar to EPHUP
+                            //
+                            if(errno!=EAGAIN)  
                             {
                                 epoll_ctl(child_epollfd,EPOLL_CTL_DEL,fd,0);
                                 close(fd);
@@ -199,7 +199,7 @@ int run_child(int index)
                            //  add send message
                             break;
                         }
-                        else if(ret==0)  //client close this connection
+                        else if(ret==0)  //client close this connection  with ct
                         {
                             epoll_ctl(child_epollfd,EPOLL_CTL_DEL,fd,0);
                             close(fd);  //thoroughly close the fd
@@ -207,6 +207,7 @@ int run_child(int index)
                         }
                         else
                         {
+                           //  buffer is not emptypty 
                             users[fd].read_idx+=ret;
                             idx=users[fd].read_idx;
                             printf("user's content is :%s\n",users[fd].buf);
